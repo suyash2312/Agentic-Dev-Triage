@@ -3,6 +3,7 @@ import numpy as np
 from state import AgentState
 from dotenv import load_dotenv
 from langchain_groq import ChatGroq
+from groq import APIError, RateLimitError, APIConnectionError
 
 load_dotenv()
 llm = ChatGroq(model="openai/gpt-oss-120b")
@@ -27,7 +28,17 @@ def classify_input(state: AgentState):
     ASSIGNEE: [who/what team]
     SUMMARY: [one sentence]
     """
-    response = llm.invoke(prompt)
+    try:
+        response = llm.invoke(prompt)
+    except RateLimitError:
+        print("Groq rate limit hit — wait a bit and try again.")
+        return {"category": "Unknown", "assignee": "Unassigned", "summary": "Could not classify — rate limited."}
+    except APIConnectionError:
+        print("Could not reach Groq — check your internet connection.")
+        return {"category": "Unknown", "assignee": "Unassigned", "summary": "Could not classify — connection error."}
+    except APIError as e:
+        print(f"Groq API error: {e}")
+        return {"category": "Unknown", "assignee": "Unassigned", "summary": "Could not classify — API error."}
     text = get_text(response)
     lines = text.split("\n")
     category = ""
@@ -93,7 +104,17 @@ def draft_output(state: AgentState):
     Keep it under 3 sentences, direct and constructive.
     """
 
-    response = llm.invoke(prompt)
+    try:
+        response = llm.invoke(prompt)
+    except RateLimitError:
+        print("Groq rate limit hit — wait a bit and try again.")
+        return {"draft": "Could not generate draft — rate limited. Please try again shortly."}
+    except APIConnectionError:
+        print("Could not reach Groq — check your internet connection.")
+        return {"draft": "Could not generate draft — connection error."}
+    except APIError as e:
+        print(f"Groq API error: {e}")
+        return {"draft": f"Could not generate draft — API error."}
     text = get_text(response)
     return {"draft": text.strip()}
 
