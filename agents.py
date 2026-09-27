@@ -2,16 +2,16 @@ from sentence_transformers import SentenceTransformer
 import numpy as np
 from state import AgentState
 from dotenv import load_dotenv
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_groq import ChatGroq
 
 load_dotenv()
-llm = ChatGoogleGenerativeAI(model="gemini-3.8-flash")
+llm = ChatGroq(model="openai/gpt-oss-120b")
 
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
 
 def get_text(response):
-    return response.content[0]["text"]
+    return response.content
 
 
 def classify_input(state: AgentState):
@@ -97,36 +97,6 @@ def draft_output(state: AgentState):
     text = get_text(response)
     return {"draft": text.strip()}
 
-# if __name__ == "__main__":
-#     test_state = {
-#         "source_type": "pr_comment",
-#         "raw_input": "",
-#         "category": "",
-#         "assignee": "",
-#         "summary": "Recursion code gave time limit exceeded error",
-#         "kb_solution": "",
-#         "draft": "",
-#         "repo": "",
-#         "target_number": "",
-#     }
-#     result = retrieve_kb(test_state)
-#     print(result)
-
-
-if __name__ == "__main__":
-    test_state = {
-        "source_type": "pr_comment",
-        "raw_input": "This function recalculates fibonacci(n) recursively every time it's called, even for the same inputs repeatedly.",
-        "category": "", "assignee": "", "summary": "",
-        "kb_solution": "", "draft": "", "repo": "", "target_number": "",
-    }
-    classify_result = classify_input(test_state)
-    test_state.update(classify_result)   # merge classify's output into state
-    print("After classify:", test_state)
-
-    kb_result = retrieve_kb(test_state)
-    test_state.update(kb_result)
-    print("After retrieve_kb:", test_state)
 
 if __name__ == "__main__":
     test_state = {
