@@ -16,8 +16,12 @@ def post_comment(repo, number, body):
         "Authorization": f"token {token}",
         "Accept": "application/vnd.github+json"
     }
+
     response = requests.post(url, headers=headers, json={"body": body})
-    print(response.status_code)
+    if response.status_code == 201:
+        print(f"Comment posted on {repo}#{number}")
+    else:
+        print(f"Failed to post comment (status {response.status_code})")
 
 
 def add_label(repo, number, label):
@@ -33,11 +37,12 @@ def add_label(repo, number, label):
         "Accept": "application/vnd.github+json"
     }
     response = requests.post(url, headers=headers, json={"labels": [label]})
-    print(response.status_code)
+    if response.status_code == 200:
+        print(f"Label '{label}' added to {repo}#{number}")
+    else:
+        print(f"Failed to add label (status {response.status_code})")
 
 
 if __name__ == "__main__":
     post_comment("suyash2312/Agentic-Dev-Triage", 1, "Test comment")
-
-if __name__ == "__main__":
     add_label("suyash2312/Agentic-Dev-Triage", 1, "performance")
