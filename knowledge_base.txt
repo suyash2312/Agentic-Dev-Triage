@@ -17,3 +17,88 @@ Source: CI_FAILURE
 Category: Flaky Test
 Issue: Server call has no timeout, so a slow response makes the test hang or fail unpredictably.
 Fix: Add an explicit timeout to the request, and retry with backoff instead of waiting indefinitely.
+
+Source: PR_COMMENT
+Category: Security
+Issue: User-uploaded file is saved using its original filename without sanitization, allowing path traversal (e.g. "../../etc/passwd").
+Fix: Sanitize the filename (strip path separators) or generate a new random filename server-side before saving.
+
+Source: PR_COMMENT
+Category: Security
+Issue: Password or sensitive data is logged in plaintext via print statements or logging calls.
+Fix: Remove sensitive fields from logs entirely, or mask them (e.g. show only last 4 characters) before logging.
+
+Source: PR_COMMENT
+Category: Style
+Issue: Magic numbers (unexplained literal values like 86400 or 0.15) are used directly in code without context.
+Fix: Extract the value into a named constant (e.g. SECONDS_PER_DAY = 86400) so its meaning is clear at a glance.
+
+Source: PR_COMMENT
+Category: Logic
+Issue: Comparing floating-point numbers with == for equality, which can fail due to precision errors.
+Fix: Use a tolerance-based comparison instead, e.g. abs(a - b) < 1e-9, rather than exact equality.
+
+Source: CI_FAILURE
+Category: Infra Outage
+Issue: CI job fails immediately with a Docker registry pull error or "connection refused" when fetching a base image.
+Fix: Check the CI provider's and container registry's status pages first; retry the job once service is confirmed restored rather than debugging the Dockerfile.
+
+Source: CI_FAILURE
+Category: Actual Bug
+Issue: A test that checks a specific output value now fails with a different, deterministic value on every run since the last merge.
+Fix: Bisect to find the introducing commit, reproduce locally with the same inputs, and treat this as a genuine logic regression requiring a fix, not a test or environment issue.
+
+Source: CI_FAILURE
+Category: Dependency Issue
+Issue: Lockfile (package-lock.json / poetry.lock / requirements.txt) is out of sync with the actual manifest file, causing install failures in CI but not locally.
+Fix: Regenerate the lockfile from the manifest and commit it, and add a CI check that fails if the lockfile is stale relative to the manifest.
+
+Source: CI_FAILURE
+Category: Flaky Test
+Issue: A test occasionally fails only on CI's parallel test runners, never when run in isolation.
+Fix: Look for tests sharing a port, temp file, or database table without proper isolation; give each parallel worker its own isolated resources.
+
+Source: PR_COMMENT
+Category: Security
+Issue: API key or database password is hardcoded directly in source code instead of an environment variable.
+Fix: Move the secret to an environment variable or secrets manager, add it to .gitignore, and rotate the exposed credential immediately.
+
+Source: PR_COMMENT
+Category: Security
+Issue: User input is concatenated directly into a SQL query string instead of using parameters.
+Fix: Use parameterized queries or an ORM query builder to prevent SQL injection.
+
+Source: PR_COMMENT
+Category: Performance
+Issue: A database query runs inside a loop, executing once per item instead of fetching all items in one call.
+Fix: Batch the queries with a single JOIN, or use eager loading (select_related / prefetch_related) to fetch related data up front.
+
+Source: PR_COMMENT
+Category: Logic
+Issue: Function assumes an API response always has a certain field, without checking if the field exists first.
+Fix: Use .get() with a default value, or add an explicit check before accessing the field, to handle missing/malformed responses gracefully.
+
+Source: PR_COMMENT
+Category: Style
+Issue: A single function handles input validation, business logic, and database writes all in one place.
+Fix: Split into separate functions — one per responsibility — so each can be tested and reused independently.
+
+Source: CI_FAILURE
+Category: Flaky Test
+Issue: An async test occasionally fails because it checks a result before a background task has finished.
+Fix: Await the task explicitly or use a polling/retry helper instead of assuming completion order; avoid relying on fixed sleep delays.
+
+Source: CI_FAILURE
+Category: Infra Outage
+Issue: CI job is killed mid-run with an out-of-memory error, with no code changes that would explain increased memory use.
+Fix: Check if the CI runner's resource tier changed or another job is competing for memory; consider increasing the runner's memory allocation or splitting the job.
+
+Source: CI_FAILURE
+Category: Dependency Issue
+Issue: CI fails with a missing system library or binary (e.g. "libpq not found") that isn't a Python/Node package.
+Fix: Add the missing OS-level package to the CI image's setup step (e.g. apt-get install), since language package managers don't install system dependencies.
+
+Source: CI_FAILURE
+Category: Actual Bug
+Issue: A test fails consistently after merging a dependency update, and the failure reproduces locally with the new dependency version.
+Fix: Check the dependency's changelog for breaking changes; this is a genuine compatibility bug requiring a code fix, not a flaky/infra issue.
