@@ -102,3 +102,58 @@ Source: CI_FAILURE
 Category: Actual Bug
 Issue: A test fails consistently after merging a dependency update, and the failure reproduces locally with the new dependency version.
 Fix: Check the dependency's changelog for breaking changes; this is a genuine compatibility bug requiring a code fix, not a flaky/infra issue.
+
+Source: PR_COMMENT
+Category: Security
+Issue: Cross-site scripting (XSS) risk — user-provided text is rendered directly into HTML without escaping.
+Fix: Escape or sanitize user input before rendering, or use a templating engine that auto-escapes by default.
+
+Source: PR_COMMENT
+Category: Security
+Issue: JWT or session token is stored in localStorage, making it accessible to any injected script (XSS-exploitable).
+Fix: Store tokens in an HttpOnly, Secure cookie instead, so client-side JavaScript cannot read them.
+
+Source: PR_COMMENT
+Category: Performance
+Issue: A large file is read entirely into memory with .read() before processing, even though it could be streamed.
+Fix: Process the file line-by-line or in chunks instead of loading the whole thing into memory at once.
+
+Source: PR_COMMENT
+Category: Performance
+Issue: A list is searched with "in" inside a loop, giving O(n²) behavior when a set lookup would be O(1).
+Fix: Convert the list to a set before the loop if membership checks are the only operation needed.
+
+Source: PR_COMMENT
+Category: Logic
+Issue: A mutable default argument (e.g. def f(x, cache={})) is used, causing state to leak between function calls.
+Fix: Use None as the default and initialize the mutable value inside the function body instead.
+
+Source: PR_COMMENT
+Category: Logic
+Issue: Exception is caught with a bare "except:" clause, silently swallowing all errors including unrelated ones.
+Fix: Catch the specific exception type expected, and let unexpected exceptions propagate or be logged.
+
+Source: PR_COMMENT
+Category: Style
+Issue: Deeply nested if/else blocks (4+ levels) make the control flow hard to follow.
+Fix: Use early returns/guard clauses to flatten the logic instead of nesting further.
+
+Source: CI_FAILURE
+Category: Flaky Test
+Issue: Test depends on the current system time (e.g. datetime.now()) and fails near midnight or month boundaries.
+Fix: Mock/freeze the clock in tests (e.g. using freezegun) instead of relying on the real system time.
+
+Source: CI_FAILURE
+Category: Dependency Issue
+Issue: Two transitive dependencies require conflicting versions of the same package, causing an unresolvable install error.
+Fix: Use a dependency resolver override/pin to force a compatible shared version, or upgrade the outdated dependency causing the conflict.
+
+Source: CI_FAILURE
+Category: Actual Bug
+Issue: A newly added feature's test passes locally but fails in CI due to a hardcoded local file path or hostname.
+Fix: Replace hardcoded local paths/hosts with environment-relative values or test fixtures that work in any environment.
+
+Source: CI_FAILURE
+Category: Infra Outage
+Issue: All CI jobs across multiple unrelated repos start failing at the same time with authentication errors.
+Fix: Check whether the CI provider's OAuth/token service is down before assuming a project-specific config issue.
