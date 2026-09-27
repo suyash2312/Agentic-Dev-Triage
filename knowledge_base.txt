@@ -1,0 +1,19 @@
+Source: PR_COMMENT
+Category: Performance
+Issue: Recursive function recalculates the same subproblem multiple times, wasting time and resources.
+Fix: Store previously computed results (memoization) — e.g. a hash map or array cache — and reuse them instead of recomputing.
+
+Source: PR_COMMENT
+Category: Logic
+Issue: Accessing a map with operator[] (m[key]) without checking if the key exists first, which silently inserts a default value for missing keys.
+Fix: Use m.find(key) != m.end() or m.count(key) to check existence before reading, or use m.contains(key) (C++20) if you don't need the value yet.
+
+Source: CI_FAILURE
+Category: Dependency Issue
+Issue: NumPy import breaks after installing TensorFlow, because TensorFlow requires a specific NumPy version range.
+Fix: Use a virtual environment and pin NumPy to a version compatible with the installed TensorFlow release (check TensorFlow's compatibility matrix).
+
+Source: CI_FAILURE
+Category: Flaky Test
+Issue: Server call has no timeout, so a slow response makes the test hang or fail unpredictably.
+Fix: Add an explicit timeout to the request, and retry with backoff instead of waiting indefinitely.
