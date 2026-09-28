@@ -33,9 +33,9 @@ Built as a learning project to understand agentic pipelines, retrieval-augmented
 ## Architecture
 
 ```
-                 PR comment  ──┐
+                  PR comment  ──┐
                                 ├─→ classify_input → retrieve_kb → draft_output → GitHub dispatch
-        CI failure log       ──┘
+              CI failure log  ──┘
 ```
 
 The pipeline is a single, linear [LangGraph](https://github.com/langchain-ai/langgraph) `StateGraph` with three nodes and one shared state object flowing through all of them:
@@ -66,6 +66,7 @@ The original inspiration for this project routed only one kind of input (bug rep
 | `github_client.py`   | `post_comment` and `add_label` — GitHub REST API calls with a dry-run fallback when no token is set      |
 | `main.py`            | Builds the LangGraph `StateGraph`, wires the 3 nodes with edges, and runs the CLI                        |
 | `requirements.txt`   | Python dependencies                                                                                      |
+| `threshold_test.py` | Standalone script that measures retrieval scores across many test queries to empirically derive the similarity threshold |
 
 ## Setup
 
@@ -135,6 +136,7 @@ This was verified directly during development: the query _"Recursion code gave t
 - **Local, file-based knowledge base instead of a vector database.** For a knowledge base this size, a plain `.txt` file re-embedded on every call is simpler to read, edit, and debug than standing up a vector store — the trade-off is it re-computes all embeddings every single call rather than caching them, which wouldn't scale to a large KB.
 - **Dry-run-by-default dispatch.** `github_client.py` checks for `GITHUB_TOKEN` before making any real API call, so the entire pipeline — including a full LangGraph run — can be tested and demoed without needing live GitHub credentials at all.
 - **One shared LLM client, swappable provider.** `agents.py` centralizes the LLM client into a single `llm` object and a single `get_text()` helper, so switching providers (this project moved from Gemini to Groq mid-build, see below) only requires changing 2-3 lines, not every function.
+- **Similarity threshold tuned empirically, not guessed.** `retrieve_kb`'s match threshold (0.285) was derived by running `threshold_test.py` — a script that tests 35 queries spanning every category against the knowledge base and reports the score distribution. It found a clean gap between genuine matches (lowest: 0.347) and unrelated queries (highest: 0.224), with the threshold set at the midpoint. Re-running this script as the knowledge base grows is recommended, since the margin between "correct match" and "close-but-wrong match" narrows as more topically similar entries are added.
 
 ## Challenges hit while building this
 
@@ -161,3 +163,13 @@ Documented here because debugging real infrastructure issues was as much a part 
 - **NumPy** — cosine similarity computation
 - **GitHub REST API** — comment and label dispatch
 - **python-dotenv** — environment variable / secrets management
+
+## Author
+
+**Suyash Jagtap**
+
+*B.Tech Electrical Engineering, IIT Bombay*
+
+<sub>AI/ML enthusiast</sub>
+
+[GitHub](https://github.com/suyash2312)
