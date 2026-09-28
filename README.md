@@ -166,5 +166,8 @@ Documented here because debugging real infrastructure issues was as much a part 
 
 ## Author
 
-Suyash Jagtap
+**Suyash Jagtap**
 B.Tech Electrical Engineering, IIT Bombay
+AI/ML enthusiast
+
+[GitHub](https://github.com/suyash2312)
