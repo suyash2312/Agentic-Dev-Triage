@@ -86,7 +86,7 @@ def retrieve_kb(state: AgentState):
         if score > best_score:
             best_score = score
             best_index = i
-    threshold = 0.4
+    threshold = 0.285
 
     if best_score > threshold:
         return {"kb_solution": fixes[best_index]}
