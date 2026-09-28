@@ -33,9 +33,9 @@ Built as a learning project to understand agentic pipelines, retrieval-augmented
 ## Architecture
 
 ```
-                 PR comment  ──┐
+                  PR comment  ──┐
                                 ├─→ classify_input → retrieve_kb → draft_output → GitHub dispatch
-        CI failure log       ──┘
+              CI failure log  ──┘
 ```
 
 The pipeline is a single, linear [LangGraph](https://github.com/langchain-ai/langgraph) `StateGraph` with three nodes and one shared state object flowing through all of them:
