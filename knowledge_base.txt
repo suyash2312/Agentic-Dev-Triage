@@ -157,3 +157,63 @@ Source: CI_FAILURE
 Category: Infra Outage
 Issue: All CI jobs across multiple unrelated repos start failing at the same time with authentication errors.
 Fix: Check whether the CI provider's OAuth/token service is down before assuming a project-specific config issue.
+
+Source: PR_COMMENT
+Category: Security
+Issue: CORS is configured with a wildcard origin ("*"), allowing any website to make authenticated requests to the API.
+Fix: Restrict allowed origins to a specific, known list of trusted domains instead of using a wildcard.
+
+Source: PR_COMMENT
+Category: Security
+Issue: Password is stored using a fast hash (e.g. MD5 or plain SHA-256) instead of a slow, purpose-built hashing algorithm.
+Fix: Use bcrypt, scrypt, or Argon2 for password hashing — these are deliberately slow to resist brute-force attacks.
+
+Source: PR_COMMENT
+Category: Performance
+Issue: A string is built by repeated += concatenation inside a loop, which is O(n²) due to string immutability.
+Fix: Collect pieces in a list and join them once at the end with "".join(pieces), or use a StringBuilder-equivalent.
+
+Source: PR_COMMENT
+Category: Performance
+Issue: The same expensive computation is repeated on every request instead of being cached or precomputed.
+Fix: Cache the result (in-memory, Redis, or a computed field) and invalidate it only when the underlying data actually changes.
+
+Source: PR_COMMENT
+Category: Logic
+Issue: Integer division is used where floating-point division was intended, silently truncating the result.
+Fix: Use true division (/ in Python 3, or explicitly cast one operand to float) instead of integer division (//) when a precise result is needed.
+
+Source: PR_COMMENT
+Category: Logic
+Issue: A loop that modifies a list while iterating over it skips elements or raises unexpected errors.
+Fix: Iterate over a copy of the list (list(original)) or build a new list instead of mutating the one you're iterating over.
+
+Source: PR_COMMENT
+Category: Style
+Issue: Boolean parameters are passed as bare True/False in function calls, making call sites unreadable (e.g. process(data, True, False)).
+Fix: Use keyword arguments at the call site (process(data, retry=True, verbose=False)) or replace flags with an enum for clarity.
+
+Source: PR_COMMENT
+Category: Style
+Issue: Commented-out code is left in the file instead of being removed.
+Fix: Delete commented-out code — version control (git history) already preserves it if it's ever needed again.
+
+Source: CI_FAILURE
+Category: Flaky Test
+Issue: Test relies on a specific ordering of items in a set or dictionary, which isn't guaranteed across Python versions/runs.
+Fix: Sort the collection explicitly before asserting on it, rather than relying on incidental iteration order.
+
+Source: CI_FAILURE
+Category: Dependency Issue
+Issue: CI uses a different Node/Python version than what's specified in the project's version file, causing subtle behavior differences.
+Fix: Pin the exact runtime version in CI config (e.g. via .nvmrc, .python-version) and have the CI step read from it explicitly.
+
+Source: CI_FAILURE
+Category: Infra Outage
+Issue: CI jobs queue for an unusually long time with no jobs actually failing once they start.
+Fix: Check the CI provider's runner capacity/status page — this is typically provider-side congestion, not a project configuration issue.
+
+Source: CI_FAILURE
+Category: Actual Bug
+Issue: A previously-passing integration test now fails after a schema/migration change, with a clear, reproducible error about a missing or renamed field.
+Fix: Update the test fixtures and any code referencing the old schema — this is a real breaking change requiring code updates, not a test artifact.
