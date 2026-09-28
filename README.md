@@ -163,3 +163,8 @@ Documented here because debugging real infrastructure issues was as much a part 
 - **NumPy** — cosine similarity computation
 - **GitHub REST API** — comment and label dispatch
 - **python-dotenv** — environment variable / secrets management
+
+## Author
+
+Suyash Jagtap
+B.Tech Electrical Engineering, IIT Bombay
